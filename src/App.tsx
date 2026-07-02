@@ -38,7 +38,8 @@ function App() {
       .filter(
         (p) =>
           p.speciesName.toLowerCase().includes(query) ||
-          p.speciesId.toLowerCase().includes(query)
+          p.speciesId.toLowerCase().includes(query) ||
+          p.speciesNameKo.toLowerCase().includes(query)
       )
       .slice(0, 15)
   }, [searchQuery])
@@ -212,8 +213,8 @@ function App() {
               <input
                 id="pokemon-search"
                 type="text"
-                placeholder="Search Pokémon species (e.g. Swampert)..."
-                value={searchQuery || selectedPokemon.speciesName}
+                placeholder="Search Pokémon species (e.g. Swampert, 대짱이)..."
+                value={searchQuery || `${selectedPokemon.speciesNameKo} (${selectedPokemon.speciesName})`}
                 onFocus={() => {
                   setDropdownOpen(true)
                   setSearchQuery('')
@@ -230,11 +231,13 @@ function App() {
                     className={`dropdown-item ${p.speciesId === selectedSpeciesId ? 'active' : ''}`}
                     onClick={() => {
                       setSelectedSpeciesId(p.speciesId)
-                      setSearchQuery(p.speciesName)
+                      setSearchQuery(`${p.speciesNameKo} (${p.speciesName})`)
                       setDropdownOpen(false)
                     }}
                   >
-                    <span className="pokemon-name">{p.speciesName}</span>
+                    <span className="pokemon-name">
+                      {p.speciesNameKo} <span className="eng-name">({p.speciesName})</span>
+                    </span>
                     <div className="types-badges">
                       {p.types.map((t) => (
                         <span key={t} className={`type-badge badge-${t}`}>

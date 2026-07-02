@@ -1,5 +1,6 @@
 import pokemonData from '../data/pokemon.json'
 import cpmData from '../data/cpm.json'
+import pokemonKoData from '../data/pokemon_ko.json'
 
 export interface Pokemon {
   speciesId: string
@@ -8,6 +9,7 @@ export interface Pokemon {
   def: number
   hp: number
   types: string[]
+  speciesNameKo: string
 }
 
 export interface IvSpread {
@@ -21,13 +23,45 @@ export interface IvSpread {
   rank: number
 }
 
+// Helper to translate English name to Korean
+export function getKoreanName(englishName: string): string {
+  const match = englishName.match(/^([^(]+)(?:\s*\(([^)]+)\))?$/)
+  if (!match) return englishName
+
+  const basePart = match[1].trim()
+  const suffixPart = match[2] ? match[2].trim() : ''
+
+  // Look up base name translation
+  const baseKo = (pokemonKoData.base as Record<string, string>)[basePart.toLowerCase()] || basePart
+
+  if (!suffixPart) {
+    return baseKo
+  }
+
+  // Look up suffix words translation
+  const suffixKo = suffixPart
+    .split(/\s+/)
+    .map((word) => (pokemonKoData.suffixes as Record<string, string>)[word.toLowerCase()] || word)
+    .join(' ')
+
+  return `${baseKo} (${suffixKo})`
+}
+
 // Map of speciesId to Pokemon for fast lookup
-export const pokemonMap: Record<string, Pokemon> = pokemonData.reduce((acc, p) => {
+const translatedPokemonList: Pokemon[] = pokemonData.map((p) => {
+  return {
+    ...p,
+    speciesNameKo: getKoreanName(p.speciesName),
+  }
+})
+
+export const pokemonList: Pokemon[] = translatedPokemonList
+
+export const pokemonMap: Record<string, Pokemon> = translatedPokemonList.reduce((acc, p) => {
   acc[p.speciesId] = p
   return acc
 }, {} as Record<string, Pokemon>)
 
-export const pokemonList: Pokemon[] = pokemonData
 
 // Retrieve CPM for a given level
 export function getCpm(level: number): number {
