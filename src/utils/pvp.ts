@@ -10,6 +10,11 @@ export interface Pokemon {
   hp: number
   types: string[]
   speciesNameKo: string
+  family?: {
+    id: string
+    evolutions?: string[]
+    parent?: string
+  } | null
 }
 
 export interface IvSpread {
@@ -61,6 +66,28 @@ export const pokemonMap: Record<string, Pokemon> = translatedPokemonList.reduce(
   acc[p.speciesId] = p
   return acc
 }, {} as Record<string, Pokemon>)
+
+// Get all evolutions recursively in order (e.g. bulbasaur -> ivysaur -> venusaur)
+export function getEvolutionChain(pokemonId: string): string[] {
+  const result: string[] = [pokemonId]
+  const visited = new Set<string>([pokemonId])
+  const queue = [pokemonId]
+
+  while (queue.length > 0) {
+    const currentId = queue.shift()!
+    const current = pokemonMap[currentId]
+    if (current && current.family && current.family.evolutions) {
+      for (const evoId of current.family.evolutions) {
+        if (!visited.has(evoId)) {
+          visited.add(evoId)
+          result.push(evoId)
+          queue.push(evoId)
+        }
+      }
+    }
+  }
+  return result
+}
 
 
 // Retrieve CPM for a given level

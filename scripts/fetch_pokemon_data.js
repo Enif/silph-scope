@@ -30,6 +30,7 @@ async function run() {
         def,
         hp,
         types: p.types || [],
+        family: p.family || null,
       }
     })
 
