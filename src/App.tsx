@@ -139,6 +139,7 @@ function App() {
             ivAtk={ivAtk}
             ivDef={ivDef}
             ivSta={ivSta}
+            maxLevel={maxLevel}
           />
         </section>
 
