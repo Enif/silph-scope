@@ -28,28 +28,43 @@ export const IvSliders: React.FC<IvSlidersProps> = ({
     const colorClass = getBarColor(val)
 
     return (
-      <div className="flex flex-col gap-2">
-        <div className="flex justify-between text-xs font-semibold text-text-main font-sans">
+      <div className="flex flex-col gap-1.5 font-sans">
+        <div className="flex justify-between text-xs font-semibold text-text-main">
           <span>{label}</span>
         </div>
-        <input
-          type="range"
-          min="0"
-          max="15"
-          value={val}
-          onChange={(e) => onChange(parseInt(e.target.value))}
-          className="cursor-pointer"
-        />
-        <div className="flex items-center gap-3">
-          <div className="flex-1 h-3 bg-white/8 rounded-sm relative overflow-hidden shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)]">
-            <div
-              className={`h-full rounded-sm transition-all duration-300 ${colorClass}`}
-              style={{ width: `${percentage}%` }}
+        
+        <div className="flex items-center">
+          {/* Interactive Unified Bar Area */}
+          <div className="relative flex-1 h-6 flex items-center group">
+            {/* Native Invisible Range Input (overlayed for touch & click) */}
+            <input
+              type="range"
+              min="0"
+              max="15"
+              value={val}
+              onChange={(e) => onChange(parseInt(e.target.value))}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
             />
-            <div className="absolute top-0 bottom-0 w-[2px] bg-[#12101c] opacity-85 left-[33.33%]" />
-            <div className="absolute top-0 bottom-0 w-[2px] bg-[#12101c] opacity-85 left-[66.66%]" />
+            
+            {/* Visual Segments (Appraisal Style) */}
+            <div className="w-full h-3.5 bg-white/8 rounded-sm relative overflow-hidden shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)] z-0">
+              <div
+                className={`h-full rounded-sm transition-all duration-300 ${colorClass}`}
+                style={{ width: `${percentage}%` }}
+              />
+              <div className="absolute top-0 bottom-0 w-[2px] bg-[#12101c] opacity-85 left-[33.33%]" />
+              <div className="absolute top-0 bottom-0 w-[2px] bg-[#12101c] opacity-85 left-[66.66%]" />
+            </div>
+
+            {/* Custom Glowing Slider Handle */}
+            <div
+              className="absolute w-1 h-5 bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.8)] pointer-events-none transition-opacity duration-150 z-10 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100"
+              style={{ left: `calc(${percentage}% - 2px)` }}
+            />
           </div>
-          <span className="text-xs font-bold min-w-[18px] text-right font-sans">{val}</span>
+          
+          {/* Numerical Value Display */}
+          <span className="text-xs font-bold min-w-[20px] text-right ml-3">{val}</span>
         </div>
       </div>
     )
