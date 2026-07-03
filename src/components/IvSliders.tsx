@@ -43,7 +43,7 @@ export const IvSliders: React.FC<IvSlidersProps> = ({
               max="15"
               value={val}
               onChange={(e) => onChange(parseInt(e.target.value))}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20 appraisal-slider"
             />
             
             {/* Visual Segments (Appraisal Style) */}
