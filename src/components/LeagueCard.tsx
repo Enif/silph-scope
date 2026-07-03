@@ -54,6 +54,10 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({
               <span className="detail-name">Optimal Level</span>
               <span className="detail-value">Lvl {stats.level}</span>
             </div>
+            <div className="detail-row">
+              <span className="detail-name">Rank Percentile</span>
+              <span className="detail-value">{(((4096 - stats.rank) / 4095) * 100).toFixed(2)}%</span>
+            </div>
             {stats.level > 40 && <div className="xl-badge">Requires XL Candy</div>}
             <div className="detail-row spacing">
               <span className="detail-name">Scaled Stats</span>
