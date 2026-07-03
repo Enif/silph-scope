@@ -19,20 +19,35 @@ export const AppraisalPreview: React.FC<AppraisalPreviewProps> = ({ atk, def, st
   }, [totalIvs])
 
   return (
-    <div className={`appraisal-preview ${totalIvs === 45 ? 'hundo' : ''}`}>
-      <div className="appraisal-stars">
-        {[1, 2, 3].map((starNum) => (
-          <span
-            key={starNum}
-            className={`star ${appraisalStars >= starNum ? 'filled' : ''}`}
-          >
-            ★
-          </span>
-        ))}
+    <div
+      className={`flex items-center justify-between p-4 border border-dashed border-border-light rounded-xl bg-radial from-white/3 to-black/15 transition-all duration-300 ${
+        totalIvs === 45
+          ? 'border-accent-orange bg-gradient-to-br from-accent-orange/15 to-bg-panel/40 shadow-[0_0_15px_rgba(255,127,80,0.1)]'
+          : ''
+      }`}
+    >
+      <div className="flex gap-1">
+        {[1, 2, 3].map((starNum) => {
+          const isFilled = appraisalStars >= starNum
+          return (
+            <span
+              key={starNum}
+              className={`text-2xl transition-all duration-300 ${
+                isFilled
+                  ? totalIvs === 45
+                    ? 'text-accent-orange drop-shadow-[0_0_10px_rgba(255,127,80,0.6)]'
+                    : 'text-bar-yellow drop-shadow-[0_0_8px_rgba(244,196,48,0.5)]'
+                  : 'text-white/15'
+              }`}
+            >
+              ★
+            </span>
+          )
+        })}
       </div>
-      <div className="appraisal-info">
-        <span className="appraisal-percent">{ivPercentage}% IVs</span>
-        <span className="appraisal-text">
+      <div className="flex flex-col items-end gap-0.5">
+        <span className="text-base font-extrabold text-white">{ivPercentage}% IVs</span>
+        <span className="text-xs text-text-muted font-semibold uppercase font-sans">
           {totalIvs === 45 ? '✨ Perfect Hundo! ✨' : `${atk}/${def}/${sta}`}
         </span>
       </div>

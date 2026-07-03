@@ -75,33 +75,40 @@ export const ScreenshotScanner: React.FC<ScreenshotScannerProps> = ({ onScanSucc
   }
 
   return (
-    <div className="screenshot-upload-zone">
-      <h3 className="section-subtitle">📸 Quick Scan Screenshot</h3>
-      <p className="scan-instructions">
+    <div className="flex flex-col gap-3 font-sans">
+      <h3 className="text-xs text-text-muted font-bold uppercase tracking-[1.5px]">📸 Quick Scan Screenshot</h3>
+      <p className="text-[0.8rem] text-text-muted">
         Upload an appraisal screen to automatically extract IVs
       </p>
-      <div className="file-drop-area">
+      <div className="relative border-2 border-dashed border-white/15 rounded-xl p-6 text-center cursor-pointer hover:border-accent-blue hover:bg-accent-blue/3 bg-black/15 transition-all duration-300">
         <input
           type="file"
           accept="image/*"
           onChange={handleImageUpload}
           id="screenshot-input"
+          className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
         />
-        <label htmlFor="screenshot-input" className="file-label">
-          <span className="upload-icon">📤</span>
-          <span>Select Screenshot Image</span>
+        <label htmlFor="screenshot-input" className="flex flex-col items-center gap-2 cursor-pointer">
+          <span className="text-[1.8rem]">📤</span>
+          <span className="font-semibold text-[0.85rem]">Select Screenshot Image</span>
         </label>
       </div>
 
       {scanMessage && (
-        <div className={`scan-message ${scanMessage.isError ? 'error' : 'success'}`}>
+        <div
+          className={`p-3 px-3.5 rounded-lg text-xs font-semibold ${
+            scanMessage.isError
+              ? 'bg-bar-red/10 border border-bar-red/20 text-bar-red'
+              : 'bg-accent-green/10 border border-accent-green/20 text-accent-green'
+          }`}
+        >
           {scanMessage.text}
         </div>
       )}
 
-      <div className="scan-preview-wrapper" style={{ display: uploadedImageSrc ? 'block' : 'none' }}>
-        <span className="preview-label">Visual Scanner Scan Preview:</span>
-        <canvas ref={canvasRef} className="scan-canvas" />
+      <div className="mt-2" style={{ display: uploadedImageSrc ? 'block' : 'none' }}>
+        <span className="text-[0.8rem] text-text-muted block mb-1.5">Visual Scanner Scan Preview:</span>
+        <canvas ref={canvasRef} className="w-full max-h-[400px] object-contain rounded-lg border border-border-light bg-black" />
       </div>
     </div>
   )
