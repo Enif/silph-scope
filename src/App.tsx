@@ -13,6 +13,7 @@ import { ScreenshotScanner } from './components/ScreenshotScanner'
 import { EvolutionChain } from './components/EvolutionChain'
 import { LeagueCard } from './components/LeagueCard'
 import { OptimalIvsTable } from './components/OptimalIvsTable'
+import { LevelValidator } from './components/LevelValidator'
 
 function App() {
   // Input states
@@ -129,6 +130,15 @@ function App() {
 
           <ScreenshotScanner 
             onScanSuccess={handleScanSuccess}
+          />
+
+          <div className="h-[1px] bg-white/6 w-full" />
+
+          <LevelValidator 
+            selectedPokemon={selectedPokemon}
+            ivAtk={ivAtk}
+            ivDef={ivDef}
+            ivSta={ivSta}
           />
         </section>
 
