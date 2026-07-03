@@ -8,7 +8,7 @@ interface PokemonSearchProps {
 }
 
 const badgeColors: Record<string, string> = {
-  normal: 'bg-[#a8a77a]',
+  normal: 'bg-gray-500',
   fire: 'bg-[#ee8130]',
   water: 'bg-[#6390f0]',
   electric: 'bg-[#f7d02c] text-[#111]',
@@ -100,7 +100,7 @@ export const PokemonSearch: React.FC<PokemonSearchProps> = ({ selectedPokemon, o
                   {p.speciesNameKo} <span className="text-xs text-text-muted font-medium ml-1.5">({p.speciesName})</span>
                 </span>
                 <div className="flex gap-1.5">
-                  {p.types.map((t) => (
+                  {p.types.filter((t) => t.toLowerCase() !== 'none').map((t) => (
                     <span
                       key={t}
                       className={`text-[0.7rem] font-bold uppercase px-2 py-0.5 rounded-md tracking-wider text-white ${
