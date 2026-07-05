@@ -23,7 +23,11 @@ export const IvSliders: React.FC<IvSlidersProps> = ({
     return 'bg-bar-yellow'
   }
 
-  const renderSegmentedBar = (label: string, val: number, onChange: (v: number) => void) => {
+  const renderSegmentedBar = (
+    label: string,
+    val: number,
+    onChange: (v: number) => void,
+  ) => {
     const percentage = (val / 15) * 100
     const colorClass = getBarColor(val)
 
@@ -32,7 +36,7 @@ export const IvSliders: React.FC<IvSlidersProps> = ({
         <div className="flex justify-between text-xs font-semibold text-text-main">
           <span>{label}</span>
         </div>
-        
+
         <div className="flex items-center">
           {/* Interactive Unified Bar Area */}
           <div className="relative flex-1 h-6 flex items-center group">
@@ -45,7 +49,7 @@ export const IvSliders: React.FC<IvSlidersProps> = ({
               onChange={(e) => onChange(parseInt(e.target.value))}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20 appraisal-slider"
             />
-            
+
             {/* Visual Segments (Appraisal Style) */}
             <div className="w-full h-3.5 bg-white/8 rounded-sm relative overflow-hidden shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)] z-0">
               <div
@@ -62,9 +66,11 @@ export const IvSliders: React.FC<IvSlidersProps> = ({
               style={{ left: `calc(${percentage}% - 2px)` }}
             />
           </div>
-          
+
           {/* Numerical Value Display */}
-          <span className="text-xs font-bold min-w-[20px] text-right ml-3">{val}</span>
+          <span className="text-xs font-bold min-w-[20px] text-right ml-3">
+            {val}
+          </span>
         </div>
       </div>
     )
@@ -72,7 +78,9 @@ export const IvSliders: React.FC<IvSlidersProps> = ({
 
   return (
     <div className="flex flex-col gap-[18px]">
-      <h3 className="text-xs text-text-muted font-bold uppercase tracking-[1.5px] font-sans">Set Individual Values (IVs)</h3>
+      <h3 className="text-xs text-text-muted font-bold uppercase tracking-[1.5px] font-sans">
+        Set Individual Values (IVs)
+      </h3>
       {renderSegmentedBar('Attack', atk, onChangeAtk)}
       {renderSegmentedBar('Defense', def, onChangeDef)}
       {renderSegmentedBar('HP', sta, onChangeSta)}

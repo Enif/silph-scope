@@ -5,6 +5,8 @@ import {
   getLeagueRankings,
   getIvSpreadRank,
   getEvolutionChain,
+  calculateCp,
+  getCpm,
 } from './utils/pvp'
 import { PokemonSearch } from './components/PokemonSearch'
 import { IvSliders } from './components/IvSliders'
@@ -23,6 +25,8 @@ function App() {
   const [ivDef, setIvDef] = useState(15)
   const [ivSta, setIvSta] = useState(15)
   const [includeLevel51, setIncludeLevel51] = useState(false)
+  const [inputCp, setInputCp] = useState<string>('')
+  const [inputHp, setInputHp] = useState<string>('')
 
   // Get active Pokémon
   const selectedPokemon = useMemo(() => {
@@ -42,26 +46,135 @@ function App() {
   const maxLevel = includeLevel51 ? 51 : 50
 
   const superLeagueStats = useMemo(() => {
-    return getIvSpreadRank(selectedEvolutionPokemon, ivAtk, ivDef, ivSta, 1500, maxLevel)
+    return getIvSpreadRank(
+      selectedEvolutionPokemon,
+      ivAtk,
+      ivDef,
+      ivSta,
+      1500,
+      maxLevel,
+    )
   }, [selectedEvolutionPokemon, ivAtk, ivDef, ivSta, maxLevel])
 
   const hyperLeagueStats = useMemo(() => {
-    return getIvSpreadRank(selectedEvolutionPokemon, ivAtk, ivDef, ivSta, 2500, maxLevel)
+    return getIvSpreadRank(
+      selectedEvolutionPokemon,
+      ivAtk,
+      ivDef,
+      ivSta,
+      2500,
+      maxLevel,
+    )
   }, [selectedEvolutionPokemon, ivAtk, ivDef, ivSta, maxLevel])
 
   const superLeagueTop10 = useMemo(() => {
-    return getLeagueRankings(selectedEvolutionPokemon, 1500, maxLevel).slice(0, 10)
+    return getLeagueRankings(selectedEvolutionPokemon, 1500, maxLevel).slice(
+      0,
+      10,
+    )
   }, [selectedEvolutionPokemon, maxLevel])
 
   const hyperLeagueTop10 = useMemo(() => {
-    return getLeagueRankings(selectedEvolutionPokemon, 2500, maxLevel).slice(0, 10)
+    return getLeagueRankings(selectedEvolutionPokemon, 2500, maxLevel).slice(
+      0,
+      10,
+    )
   }, [selectedEvolutionPokemon, maxLevel])
 
   // Handler for image scanning results
-  const handleScanSuccess = (atk: number, def: number, hp: number) => {
+  const handleScanSuccess = (
+    atk: number,
+    def: number,
+    hp: number,
+    pokemonName?: string,
+    cp?: number,
+    hpMax?: number,
+  ) => {
     setIvAtk(atk)
     setIvDef(def)
     setIvSta(hp)
+
+    let finalHp = hpMax
+    let matchedPokemon = null
+
+    if (pokemonName) {
+      const cleanedName = pokemonName
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9가-힣]/g, '')
+      let matched = pokemonList.find((p) => {
+        const pNameEng = p.speciesName.toLowerCase().replace(/[^a-z0-9]/g, '')
+        const pNameKo = p.speciesNameKo.replace(/[^가-힣]/g, '')
+        return pNameEng === cleanedName || pNameKo === cleanedName
+      })
+
+      if (!matched) {
+        matched = pokemonList.find((p) => {
+          const pNameEng = p.speciesName.toLowerCase().replace(/[^a-z0-9]/g, '')
+          const pNameKo = p.speciesNameKo.replace(/[^가-힣]/g, '')
+          return (
+            (cleanedName.length >= 2 && pNameKo.includes(cleanedName)) ||
+            (pNameKo.length >= 2 && cleanedName.includes(pNameKo)) ||
+            (cleanedName.length >= 3 && pNameEng.includes(cleanedName)) ||
+            (pNameEng.length >= 3 && cleanedName.includes(pNameEng))
+          )
+        })
+      }
+
+      if (matched) {
+        setSelectedSpeciesId(matched.speciesId)
+        setSelectedEvolutionId(matched.speciesId)
+        matchedPokemon = matched
+      }
+    }
+
+    if (cp !== undefined) {
+      setInputCp(cp.toString())
+
+      // Smart correction: calculate expected HP from the parsed CP, species, and scanned IVs
+      const targetPokemon = matchedPokemon || selectedPokemon
+      if (targetPokemon) {
+        let expectedHpForCp: number | undefined = undefined
+        for (let lvl = 1; lvl <= 51; lvl += 0.5) {
+          const expectedCp = calculateCp(
+            targetPokemon.atk,
+            targetPokemon.def,
+            targetPokemon.hp,
+            atk,
+            def,
+            hp,
+            lvl,
+          )
+          if (expectedCp === cp) {
+            expectedHpForCp = Math.max(
+              10,
+              Math.floor((targetPokemon.hp + hp) * getCpm(lvl)),
+            )
+            break
+          }
+        }
+
+        if (expectedHpForCp !== undefined) {
+          if (finalHp === undefined || finalHp !== expectedHpForCp) {
+            const hpStr = finalHp ? finalHp.toString() : ''
+            const expectedStr = expectedHpForCp.toString()
+            // If the scanned HP string contains or is contained in the expected HP string (like "10310" containing "103"), or is missing/obviously wrong, correct it!
+            if (
+              !finalHp ||
+              hpStr.includes(expectedStr) ||
+              expectedStr.includes(hpStr) ||
+              finalHp > 500
+            ) {
+              finalHp = expectedHpForCp
+            }
+          }
+        }
+      }
+    }
+
+    if (finalHp !== undefined) {
+      setInputHp(finalHp.toString())
+    }
   }
 
   return (
@@ -83,12 +196,13 @@ function App() {
 
       {/* Main Grid */}
       <main className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-7 items-start">
-        
         {/* Left column: Input & Controls */}
         <section className="bg-bg-panel border border-white/6 rounded-[20px] backdrop-blur-[16px] p-6 shadow-[0_12px_40px_rgba(0,0,0,0.35)] hover:border-border-glow hover:shadow-[0_16px_48px_rgba(142,68,173,0.1)] transition-all duration-300 flex flex-col gap-6">
-          <h2 className="text-xl font-bold mb-1 bg-gradient-to-r from-white to-text-muted bg-clip-text text-transparent">🔬 Pokémon Appraisal</h2>
-          
-          <PokemonSearch 
+          <h2 className="text-xl font-bold mb-1 bg-gradient-to-r from-white to-text-muted bg-clip-text text-transparent">
+            🔬 Pokémon Appraisal
+          </h2>
+
+          <PokemonSearch
             selectedPokemon={selectedPokemon}
             onSelect={(p) => {
               setSelectedSpeciesId(p.speciesId)
@@ -97,7 +211,9 @@ function App() {
           />
 
           <div className="flex items-center justify-between mt-2">
-            <span className="text-xs text-text-muted font-bold uppercase tracking-wider">Include Level 51 (Best Buddy Boost)</span>
+            <span className="text-xs text-text-muted font-bold uppercase tracking-wider">
+              Include Level 51 (Best Buddy Boost)
+            </span>
             <label className="relative inline-block w-[46px] h-[24px]">
               <input
                 type="checkbox"
@@ -111,7 +227,7 @@ function App() {
 
           <div className="h-[1px] bg-white/6 w-full" />
 
-          <IvSliders 
+          <IvSliders
             atk={ivAtk}
             def={ivDef}
             sta={ivSta}
@@ -120,33 +236,30 @@ function App() {
             onChangeSta={setIvSta}
           />
 
-          <AppraisalPreview 
-            atk={ivAtk}
-            def={ivDef}
-            sta={ivSta}
-          />
+          <AppraisalPreview atk={ivAtk} def={ivDef} sta={ivSta} />
 
           <div className="h-[1px] bg-white/6 w-full" />
 
-          <ScreenshotScanner 
-            onScanSuccess={handleScanSuccess}
-          />
+          <ScreenshotScanner onScanSuccess={handleScanSuccess} />
 
           <div className="h-[1px] bg-white/6 w-full" />
 
-          <LevelValidator 
+          <LevelValidator
             selectedPokemon={selectedPokemon}
             ivAtk={ivAtk}
             ivDef={ivDef}
             ivSta={ivSta}
             maxLevel={maxLevel}
+            inputCp={inputCp}
+            inputHp={inputHp}
+            onCpChange={setInputCp}
+            onHpChange={setInputHp}
           />
         </section>
 
         {/* Right column: Results & Listings */}
         <section className="flex flex-col gap-7">
-          
-          <EvolutionChain 
+          <EvolutionChain
             evolutionIds={evolutionIds}
             pokemonMap={pokemonMap}
             ivAtk={ivAtk}
@@ -159,7 +272,7 @@ function App() {
 
           {/* League summaries side-by-side */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <LeagueCard 
+            <LeagueCard
               title={`${selectedEvolutionPokemon.speciesNameKo} Super`}
               subtitle="Great League (Max 1500 CP)"
               leagueType="super"
@@ -170,7 +283,7 @@ function App() {
               ivSta={ivSta}
             />
 
-            <LeagueCard 
+            <LeagueCard
               title={`${selectedEvolutionPokemon.speciesNameKo} Hyper`}
               subtitle="Ultra League (Max 2500 CP)"
               leagueType="hyper"
@@ -182,7 +295,7 @@ function App() {
             />
           </div>
 
-          <OptimalIvsTable 
+          <OptimalIvsTable
             superLeagueTop10={superLeagueTop10}
             hyperLeagueTop10={hyperLeagueTop10}
             ivAtk={ivAtk}

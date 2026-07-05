@@ -28,7 +28,10 @@ const badgeColors: Record<string, string> = {
   dark: 'bg-[#705746]',
 }
 
-export const PokemonSearch: React.FC<PokemonSearchProps> = ({ selectedPokemon, onSelect }) => {
+export const PokemonSearch: React.FC<PokemonSearchProps> = ({
+  selectedPokemon,
+  onSelect,
+}) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
@@ -41,14 +44,17 @@ export const PokemonSearch: React.FC<PokemonSearchProps> = ({ selectedPokemon, o
         (p) =>
           p.speciesName.toLowerCase().includes(query) ||
           p.speciesId.toLowerCase().includes(query) ||
-          p.speciesNameKo.toLowerCase().includes(query)
+          p.speciesNameKo.toLowerCase().includes(query),
       )
       .slice(0, 15)
   }, [searchQuery])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setDropdownOpen(false)
       }
     }
@@ -63,7 +69,10 @@ export const PokemonSearch: React.FC<PokemonSearchProps> = ({ selectedPokemon, o
 
   return (
     <div className="flex flex-col gap-2 relative font-sans" ref={dropdownRef}>
-      <label htmlFor="pokemon-search" className="text-xs uppercase tracking-wider text-text-muted font-bold">
+      <label
+        htmlFor="pokemon-search"
+        className="text-xs uppercase tracking-wider text-text-muted font-bold"
+      >
         Select Pokémon
       </label>
       <div className="relative w-full">
@@ -79,7 +88,9 @@ export const PokemonSearch: React.FC<PokemonSearchProps> = ({ selectedPokemon, o
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full bg-black/30 border border-white/6 rounded-xl text-text-main py-3.5 px-4 pr-11 text-base outline-none focus:border-accent-blue focus:shadow-[0_0_12px_rgba(0,210,255,0.2)] transition-all duration-300"
         />
-        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-lg pointer-events-none opacity-60">🔍</span>
+        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-lg pointer-events-none opacity-60">
+          🔍
+        </span>
       </div>
       {dropdownOpen && (
         <div className="absolute top-full left-0 right-0 bg-[#151322] border border-white/12 rounded-xl mt-1.5 max-h-[280px] overflow-y-auto z-50 shadow-[0_12px_30px_rgba(0,0,0,0.5)]">
@@ -89,7 +100,9 @@ export const PokemonSearch: React.FC<PokemonSearchProps> = ({ selectedPokemon, o
               <div
                 key={p.speciesId}
                 className={`flex items-center justify-between p-3 px-4 cursor-pointer hover:bg-accent-purple/25 border-l-4 hover:border-l-accent-blue transition-all duration-300 ${
-                  isActive ? 'bg-accent-purple/25 border-l-accent-blue' : 'border-l-transparent'
+                  isActive
+                    ? 'bg-accent-purple/25 border-l-accent-blue'
+                    : 'border-l-transparent'
                 }`}
                 onClick={() => {
                   onSelect(p)
@@ -97,25 +110,32 @@ export const PokemonSearch: React.FC<PokemonSearchProps> = ({ selectedPokemon, o
                 }}
               >
                 <span className="font-semibold text-[0.95rem]">
-                  {p.speciesNameKo} <span className="text-xs text-text-muted font-medium ml-1.5">({p.speciesName})</span>
+                  {p.speciesNameKo}{' '}
+                  <span className="text-xs text-text-muted font-medium ml-1.5">
+                    ({p.speciesName})
+                  </span>
                 </span>
                 <div className="flex gap-1.5">
-                  {p.types.filter((t) => t.toLowerCase() !== 'none').map((t) => (
-                    <span
-                      key={t}
-                      className={`text-[0.7rem] font-bold uppercase px-2 py-0.5 rounded-md tracking-wider text-white ${
-                        badgeColors[t] || 'bg-gray-500'
-                      }`}
-                    >
-                      {t}
-                    </span>
-                  ))}
+                  {p.types
+                    .filter((t) => t.toLowerCase() !== 'none')
+                    .map((t) => (
+                      <span
+                        key={t}
+                        className={`text-[0.7rem] font-bold uppercase px-2 py-0.5 rounded-md tracking-wider text-white ${
+                          badgeColors[t] || 'bg-gray-500'
+                        }`}
+                      >
+                        {t}
+                      </span>
+                    ))}
                 </div>
               </div>
             )
           })}
           {filteredPokemon.length === 0 && (
-            <div className="p-4 text-center text-text-muted text-sm">No Pokémon found</div>
+            <div className="p-4 text-center text-text-muted text-sm">
+              No Pokémon found
+            </div>
           )}
         </div>
       )}

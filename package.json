@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
@@ -33,6 +34,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",
+    "jpeg-js": "^0.4.4",
     "prettier": "^3.9.4",
     "tailwindcss": "^4.3.2",
     "typescript": "~6.0.2",

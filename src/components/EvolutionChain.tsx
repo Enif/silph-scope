@@ -46,17 +46,35 @@ export const EvolutionChain: React.FC<EvolutionChainProps> = ({
 }) => {
   return (
     <div className="bg-bg-panel border border-white/6 rounded-[20px] backdrop-blur-[16px] p-6 shadow-[0_12px_40px_rgba(0,0,0,0.35)] hover:border-border-glow hover:shadow-[0_16px_48px_rgba(142,68,173,0.1)] transition-all duration-300 font-sans">
-      <h2 className="text-xl font-bold mb-6 bg-gradient-to-r from-white to-text-muted bg-clip-text text-transparent">🌱 Evolution Family Tree Analysis</h2>
+      <h2 className="text-xl font-bold mb-6 bg-gradient-to-r from-white to-text-muted bg-clip-text text-transparent">
+        🌱 Evolution Family Tree Analysis
+      </h2>
       <p className="text-[0.85rem] text-text-muted mb-5 leading-relaxed">
-        Compare PvP percentages for the base Pokémon and all subsequent evolution stages. Click a card to view detailed stats and IV spread tables below.
+        Compare PvP percentages for the base Pokémon and all subsequent
+        evolution stages. Click a card to view detailed stats and IV spread
+        tables below.
       </p>
       <div className="flex flex-col gap-3">
         {evolutionIds.map((evoId) => {
           const evoPokemon = pokemonMap[evoId]
           if (!evoPokemon) return null
 
-          const evoSuper = getIvSpreadRank(evoPokemon, ivAtk, ivDef, ivSta, 1500, maxLevel)
-          const evoHyper = getIvSpreadRank(evoPokemon, ivAtk, ivDef, ivSta, 2500, maxLevel)
+          const evoSuper = getIvSpreadRank(
+            evoPokemon,
+            ivAtk,
+            ivDef,
+            ivSta,
+            1500,
+            maxLevel,
+          )
+          const evoHyper = getIvSpreadRank(
+            evoPokemon,
+            ivAtk,
+            ivDef,
+            ivSta,
+            2500,
+            maxLevel,
+          )
           const isSelected = evoId === selectedEvolutionId
 
           return (
@@ -72,43 +90,67 @@ export const EvolutionChain: React.FC<EvolutionChainProps> = ({
               <div className="flex flex-col gap-1.5 flex-1">
                 <h4 className="text-base font-bold text-white flex items-baseline gap-1.5">
                   {evoPokemon.speciesNameKo}
-                  <span className="text-xs text-text-muted font-medium">({evoPokemon.speciesName})</span>
+                  <span className="text-xs text-text-muted font-medium">
+                    ({evoPokemon.speciesName})
+                  </span>
                 </h4>
                 <div className="flex gap-1.5">
-                  {evoPokemon.types.filter((t) => t.toLowerCase() !== 'none').map((t) => (
-                    <span
-                      key={t}
-                      className={`text-[0.7rem] font-bold uppercase px-2 py-0.5 rounded-md tracking-wider text-white ${
-                        badgeColors[t] || 'bg-gray-500'
-                      }`}
-                    >
-                      {t}
-                    </span>
-                  ))}
+                  {evoPokemon.types
+                    .filter((t) => t.toLowerCase() !== 'none')
+                    .map((t) => (
+                      <span
+                        key={t}
+                        className={`text-[0.7rem] font-bold uppercase px-2 py-0.5 rounded-md tracking-wider text-white ${
+                          badgeColors[t] || 'bg-gray-500'
+                        }`}
+                      >
+                        {t}
+                      </span>
+                    ))}
                 </div>
               </div>
 
               <div className="flex gap-5 my-3 md:my-0 md:mx-6 justify-between md:justify-start w-full md:w-auto">
                 <div className="flex flex-col gap-0.5 min-w-[140px]">
-                  <span className="text-[0.65rem] text-text-muted uppercase font-bold">Super League</span>
+                  <span className="text-[0.65rem] text-text-muted uppercase font-bold">
+                    Super League
+                  </span>
                   {evoSuper ? (
                     <span className="text-[0.85rem] font-medium text-[#ddd]">
-                      Rank <strong className="text-white font-bold">#{evoSuper.rank}</strong>
-                      <span className="text-[0.8rem] text-text-muted"> ({evoSuper.percentage.toFixed(1)}%)</span>
+                      Rank{' '}
+                      <strong className="text-white font-bold">
+                        #{evoSuper.rank}
+                      </strong>
+                      <span className="text-[0.8rem] text-text-muted">
+                        {' '}
+                        ({evoSuper.percentage.toFixed(1)}%)
+                      </span>
                     </span>
                   ) : (
-                    <span className="text-[0.85rem] font-medium text-bar-red/60">Ineligible</span>
+                    <span className="text-[0.85rem] font-medium text-bar-red/60">
+                      Ineligible
+                    </span>
                   )}
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-[140px]">
-                  <span className="text-[0.65rem] text-text-muted uppercase font-bold">Hyper League</span>
+                  <span className="text-[0.65rem] text-text-muted uppercase font-bold">
+                    Hyper League
+                  </span>
                   {evoHyper ? (
                     <span className="text-[0.85rem] font-medium text-[#ddd]">
-                      Rank <strong className="text-white font-bold">#{evoHyper.rank}</strong>
-                      <span className="text-[0.8rem] text-text-muted"> ({evoHyper.percentage.toFixed(1)}%)</span>
+                      Rank{' '}
+                      <strong className="text-white font-bold">
+                        #{evoHyper.rank}
+                      </strong>
+                      <span className="text-[0.8rem] text-text-muted">
+                        {' '}
+                        ({evoHyper.percentage.toFixed(1)}%)
+                      </span>
                     </span>
                   ) : (
-                    <span className="text-[0.85rem] font-medium text-bar-red/60">Ineligible</span>
+                    <span className="text-[0.85rem] font-medium text-bar-red/60">
+                      Ineligible
+                    </span>
                   )}
                 </div>
               </div>

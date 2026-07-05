@@ -50,7 +50,7 @@ function rgbToHsl(r: number, g: number, b: number) {
 // Check if a pixel color matches the filled IV bar color (red/orange/yellow)
 function isFilledBarColor(h: number, s: number, l: number): boolean {
   // Orange/Red/Yellow ranges
-  const isRedOrangeYellow = (h >= 340 || h <= 55)
+  const isRedOrangeYellow = h >= 340 || h <= 55
   const hasGoodSaturation = s >= 35
   const hasGoodLightness = l >= 30 && l <= 85
   return isRedOrangeYellow && hasGoodSaturation && hasGoodLightness
@@ -68,7 +68,13 @@ function isEmptyBarColor(s: number, l: number): boolean {
 export function scanAppraisalScreenshot(canvas: HTMLCanvasElement): ScanResult {
   const ctx = canvas.getContext('2d', { willReadFrequently: true })
   if (!ctx) {
-    return { success: false, atk: 0, def: 0, hp: 0, message: 'Could not get 2D context' }
+    return {
+      success: false,
+      atk: 0,
+      def: 0,
+      hp: 0,
+      message: 'Could not get 2D context',
+    }
   }
 
   const width = canvas.width
@@ -82,15 +88,24 @@ export function scanAppraisalScreenshot(canvas: HTMLCanvasElement): ScanResult {
 
   // Store information about rows that look like part of a bar
   // We want to find horizontal rows that contain a long stretch of filled/empty bar pixels
-  const candidateRows: { yOffset: number; startX: number; endX: number; len: number }[] = []
+  const candidateRows: {
+    yOffset: number
+    startX: number
+    endX: number
+    len: number
+  }[] = []
 
-  for (let y = 0; y < scanHeight; y += 2) { // step by 2 pixels for performance
+  const maxGap = Math.max(10, Math.ceil(width * 0.025))
+
+  for (let y = 0; y < scanHeight; y += 2) {
+    // step by 2 pixels for performance
     let inBar = false
     let longestRun = 0
     let longestStart = 0
     let longestEnd = 0
     let currentRun = 0
     let currentStart = 0
+    let gapCount = 0
 
     for (let x = 0; x < width; x++) {
       const idx = (y * width + x) * 4
@@ -107,16 +122,21 @@ export function scanAppraisalScreenshot(canvas: HTMLCanvasElement): ScanResult {
           inBar = true
           currentStart = x
         }
-        currentRun++
+        currentRun += gapCount + 1
+        gapCount = 0
       } else {
         if (inBar) {
-          inBar = false
-          if (currentRun > longestRun) {
-            longestRun = currentRun
-            longestStart = currentStart
-            longestEnd = x - 1
+          gapCount++
+          if (gapCount > maxGap) {
+            inBar = false
+            if (currentRun > longestRun) {
+              longestRun = currentRun
+              longestStart = currentStart
+              longestEnd = x - gapCount
+            }
+            currentRun = 0
+            gapCount = 0
           }
-          currentRun = 0
         }
       }
     }
@@ -125,12 +145,12 @@ export function scanAppraisalScreenshot(canvas: HTMLCanvasElement): ScanResult {
       if (currentRun > longestRun) {
         longestRun = currentRun
         longestStart = currentStart
-        longestEnd = width - 1
+        longestEnd = width - 1 - gapCount
       }
     }
 
-    // A bar is expected to be a substantial fraction of the width (e.g. 35% to 75%)
-    const minBarWidth = width * 0.3
+    // A bar is expected to be a substantial fraction of the width (e.g. 25% to 80%)
+    const minBarWidth = width * 0.25
     const maxBarWidth = width * 0.8
 
     if (longestRun >= minBarWidth && longestRun <= maxBarWidth) {
@@ -149,12 +169,18 @@ export function scanAppraisalScreenshot(canvas: HTMLCanvasElement): ScanResult {
       atk: 0,
       def: 0,
       hp: 0,
-      message: 'Could not find any appraisal bar candidates. Is this a Pokémon GO appraisal screenshot?',
+      message:
+        'Could not find any appraisal bar candidates. Is this a Pokémon GO appraisal screenshot?',
     }
   }
 
   // Group candidate rows into clusters (since a single bar is several pixels tall)
-  const clusters: { rows: typeof candidateRows; avgYOffset: number; avgStartX: number; avgEndX: number }[] = []
+  const clusters: {
+    rows: typeof candidateRows
+    avgYOffset: number
+    avgStartX: number
+    avgEndX: number
+  }[] = []
   let currentCluster: typeof candidateRows = []
 
   for (let i = 0; i < candidateRows.length; i++) {
@@ -221,7 +247,8 @@ export function scanAppraisalScreenshot(canvas: HTMLCanvasElement): ScanResult {
       const w0 = triple[0].avgEndX - triple[0].avgStartX
       const w1 = triple[1].avgEndX - triple[1].avgStartX
       const w2 = triple[2].avgEndX - triple[2].avgStartX
-      const widthVariance = Math.abs(w0 - w1) + Math.abs(w1 - w2) + Math.abs(w0 - w2)
+      const widthVariance =
+        Math.abs(w0 - w1) + Math.abs(w1 - w2) + Math.abs(w0 - w2)
 
       const score = spacingDiff + widthVariance * 0.5
       if (score < bestScore) {
@@ -235,8 +262,12 @@ export function scanAppraisalScreenshot(canvas: HTMLCanvasElement): ScanResult {
   const [atkCluster, defCluster, hpCluster] = bestClusterTriple
 
   // Determine the bounding horizontal limits (average of the three bars)
-  const barXStart = Math.round((atkCluster.avgStartX + defCluster.avgStartX + hpCluster.avgStartX) / 3)
-  const barXEnd = Math.round((atkCluster.avgEndX + defCluster.avgEndX + hpCluster.avgEndX) / 3)
+  const barXStart = Math.round(
+    (atkCluster.avgStartX + defCluster.avgStartX + hpCluster.avgStartX) / 3,
+  )
+  const barXEnd = Math.round(
+    (atkCluster.avgEndX + defCluster.avgEndX + hpCluster.avgEndX) / 3,
+  )
   const barWidth = barXEnd - barXStart
 
   // Calculate IVs

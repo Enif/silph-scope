@@ -43,7 +43,9 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({
         </div>
         <div>
           <h3 className="text-lg font-extrabold text-white">{title}</h3>
-          <p className="text-[0.75rem] text-text-muted font-semibold uppercase tracking-wider">{subtitle}</p>
+          <p className="text-[0.75rem] text-text-muted font-semibold uppercase tracking-wider">
+            {subtitle}
+          </p>
         </div>
       </div>
 
@@ -56,8 +58,12 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({
                 : 'border-accent-orange/30 shadow-[inset_0_0_15px_rgba(255,140,0,0.05)]'
             }`}
           >
-            <div className="text-[0.65rem] text-text-muted uppercase font-bold tracking-wider mb-0.5">PvP Stat Product</div>
-            <div className="text-2xl font-extrabold text-white">{stats.percentage.toFixed(2)}%</div>
+            <div className="text-[0.65rem] text-text-muted uppercase font-bold tracking-wider mb-0.5">
+              PvP Stat Product
+            </div>
+            <div className="text-2xl font-extrabold text-white">
+              {stats.percentage.toFixed(2)}%
+            </div>
             <div
               className={`absolute -bottom-2.5 text-black text-[0.75rem] font-extrabold px-2.5 py-1 rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.3)] ${
                 isSuper ? 'bg-accent-blue' : 'bg-accent-orange'
@@ -77,8 +83,12 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({
               <span className="font-bold text-white">Lvl {stats.level}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
-              <span className="text-text-muted font-medium">Rank Percentile</span>
-              <span className="font-bold text-white">{(((4096 - stats.rank) / 4095) * 100).toFixed(2)}%</span>
+              <span className="text-text-muted font-medium">
+                Rank Percentile
+              </span>
+              <span className="font-bold text-white">
+                {(((4096 - stats.rank) / 4095) * 100).toFixed(2)}%
+              </span>
             </div>
             {stats.level > 40 && (
               <div className="bg-red-500/15 border border-red-500/30 text-[#ff5555] text-[0.7rem] font-extrabold py-1 px-2.5 rounded-md text-center uppercase tracking-widest">
@@ -90,19 +100,25 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({
             </div>
             <div className="grid grid-cols-3 gap-2.5 mt-1 w-full">
               <div className="bg-white/2 border border-white/6 rounded-lg p-2 flex flex-col items-center gap-0.5">
-                <span className="text-[0.65rem] text-text-muted uppercase font-bold">Atk</span>
+                <span className="text-[0.65rem] text-text-muted uppercase font-bold">
+                  Atk
+                </span>
                 <span className="text-sm font-bold text-white">
                   {((pokemon.atk + ivAtk) * getCpm(stats.level)).toFixed(1)}
                 </span>
               </div>
               <div className="bg-white/2 border border-white/6 rounded-lg p-2 flex flex-col items-center gap-0.5">
-                <span className="text-[0.65rem] text-text-muted uppercase font-bold">Def</span>
+                <span className="text-[0.65rem] text-text-muted uppercase font-bold">
+                  Def
+                </span>
                 <span className="text-sm font-bold text-white">
                   {((pokemon.def + ivDef) * getCpm(stats.level)).toFixed(1)}
                 </span>
               </div>
               <div className="bg-white/2 border border-white/6 rounded-lg p-2 flex flex-col items-center gap-0.5">
-                <span className="text-[0.65rem] text-text-muted uppercase font-bold">HP</span>
+                <span className="text-[0.65rem] text-text-muted uppercase font-bold">
+                  HP
+                </span>
                 <span className="text-sm font-bold text-white">
                   {Math.floor((pokemon.hp + ivSta) * getCpm(stats.level))}
                 </span>
@@ -113,7 +129,9 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({
       ) : (
         <div className="bg-white/2 border border-dashed border-white/10 rounded-xl flex flex-col items-center justify-center gap-2 p-10 text-text-muted text-sm font-semibold text-center h-full">
           <span className="text-3xl">⚠️</span>
-          <span>Ineligible: Minimum CP exceeds {isSuper ? '1500' : '2500'}</span>
+          <span>
+            Ineligible: Minimum CP exceeds {isSuper ? '1500' : '2500'}
+          </span>
         </div>
       )}
     </div>

@@ -51,13 +51,15 @@ describe('PvP Math Utility Tests', () => {
     expect(rank1.percentage).toBe(100)
 
     // Ranks should be sorted desc by statProduct
-    expect(rankings[0].statProduct).toBeGreaterThanOrEqual(rankings[1].statProduct)
+    expect(rankings[0].statProduct).toBeGreaterThanOrEqual(
+      rankings[1].statProduct,
+    )
   })
 
   it('should fetch specific rank info correctly', () => {
     const swampert = pokemonMap['swampert']
     const spreadRank = getIvSpreadRank(swampert, 0, 14, 14, 1500)
-    
+
     expect(spreadRank).not.toBeNull()
     expect(spreadRank!.rank).toBe(1) // 0/14/14 is the rank 1 Swampert spread in Super League
     expect(spreadRank!.level).toBe(19)

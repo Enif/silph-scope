@@ -1,5 +1,12 @@
-import React, { useState, useMemo } from 'react'
-import { getCpm, calculateCp, calculateStatProduct, getLeagueRankings, getEvolutionChain, pokemonMap } from '../utils/pvp'
+import React, { useMemo } from 'react'
+import {
+  getCpm,
+  calculateCp,
+  calculateStatProduct,
+  getLeagueRankings,
+  getEvolutionChain,
+  pokemonMap,
+} from '../utils/pvp'
 import type { Pokemon } from '../utils/pvp'
 
 interface LevelValidatorProps {
@@ -8,6 +15,10 @@ interface LevelValidatorProps {
   ivDef: number
   ivSta: number
   maxLevel: number
+  inputCp: string
+  inputHp: string
+  onCpChange: (val: string) => void
+  onHpChange: (val: string) => void
 }
 
 const keyLevels = [15, 20, 25, 30, 35, 40, 50]
@@ -18,10 +29,11 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
   ivDef,
   ivSta,
   maxLevel,
+  inputCp,
+  inputHp,
+  onCpChange,
+  onHpChange,
 }) => {
-  const [inputCp, setInputCp] = useState<string>('')
-  const [inputHp, setInputHp] = useState<string>('')
-
   // Calculate expected stats at key levels for reference
   const keyLevelStats = useMemo(() => {
     return keyLevels.map((lvl) => {
@@ -32,9 +44,12 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
         ivAtk,
         ivDef,
         ivSta,
-        lvl
+        lvl,
       )
-      const expectedHp = Math.max(10, Math.floor((selectedPokemon.hp + ivSta) * getCpm(lvl)))
+      const expectedHp = Math.max(
+        10,
+        Math.floor((selectedPokemon.hp + ivSta) * getCpm(lvl)),
+      )
       return {
         level: lvl,
         cp: expectedCp,
@@ -61,9 +76,12 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
         ivAtk,
         ivDef,
         ivSta,
-        lvl
+        lvl,
       )
-      const expectedHp = Math.max(10, Math.floor((selectedPokemon.hp + ivSta) * getCpm(lvl)))
+      const expectedHp = Math.max(
+        10,
+        Math.floor((selectedPokemon.hp + ivSta) * getCpm(lvl)),
+      )
 
       if (expectedCp === cpNum && expectedHp === hpNum) {
         results.push(lvl)
@@ -111,7 +129,7 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
             ivAtk,
             ivDef,
             ivSta,
-            lvl
+            lvl,
           )
           if (cp <= league.cap) {
             const sp = calculateStatProduct(
@@ -121,7 +139,7 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
               ivAtk,
               ivDef,
               ivSta,
-              lvl
+              lvl,
             )
             if (sp > bestStatProduct) {
               bestStatProduct = sp
@@ -138,7 +156,9 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
           }
           const rankings = getLeagueRankings(evoPokemon, league.cap, maxLevel)
           let rank = 4096
-          const idx = rankings.findIndex((r) => r.statProduct <= bestStatProduct)
+          const idx = rankings.findIndex(
+            (r) => r.statProduct <= bestStatProduct,
+          )
           if (idx !== -1) {
             rank = rankings[idx].rank
           }
@@ -164,29 +184,36 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
 
   return (
     <div className="flex flex-col gap-4 font-sans text-text-main">
-      <h3 className="text-xs text-text-muted font-bold uppercase tracking-[1.5px]">📏 Level & CP Validator</h3>
+      <h3 className="text-xs text-text-muted font-bold uppercase tracking-[1.5px]">
+        📏 Level & CP Validator
+      </h3>
       <p className="text-[0.8rem] text-text-muted leading-relaxed">
-        Verify if this Pokémon can reach the given CP/HP at the current IVs and estimate its exact level.
+        Verify if this Pokémon can reach the given CP/HP at the current IVs and
+        estimate its exact level.
       </p>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
-          <label className="text-[0.65rem] text-text-muted uppercase font-bold">CP</label>
+          <label className="text-[0.65rem] text-text-muted uppercase font-bold">
+            CP
+          </label>
           <input
             type="number"
             placeholder="e.g. 1500"
             value={inputCp}
-            onChange={(e) => setInputCp(e.target.value)}
+            onChange={(e) => onCpChange(e.target.value)}
             className="w-full bg-black/35 border border-white/6 rounded-lg text-text-main py-2 px-3 text-sm outline-none focus:border-accent-blue transition-all"
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-[0.65rem] text-text-muted uppercase font-bold">HP</label>
+          <label className="text-[0.65rem] text-text-muted uppercase font-bold">
+            HP
+          </label>
           <input
             type="number"
             placeholder="e.g. 120"
             value={inputHp}
-            onChange={(e) => setInputHp(e.target.value)}
+            onChange={(e) => onHpChange(e.target.value)}
             className="w-full bg-black/35 border border-white/6 rounded-lg text-text-main py-2 px-3 text-sm outline-none focus:border-accent-blue transition-all"
           />
         </div>
@@ -225,7 +252,10 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
               >
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-white text-[0.85rem]">
-                    {i + 1}. {rec.speciesNameKo} <span className="text-text-muted text-[0.7rem] font-normal">({rec.speciesName})</span>
+                    {i + 1}. {rec.speciesNameKo}{' '}
+                    <span className="text-text-muted text-[0.7rem] font-normal">
+                      ({rec.speciesName})
+                    </span>
                   </span>
                   <span
                     className={`font-bold px-2 py-0.5 rounded text-[0.65rem] uppercase ${
@@ -234,14 +264,32 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
                         : 'bg-accent-orange/15 border border-accent-orange/30 text-accent-orange'
                     }`}
                   >
-                    {rec.league === 'Super League' ? 'Super (1500)' : 'Hyper (2500)'}
+                    {rec.league === 'Super League'
+                      ? 'Super (1500)'
+                      : 'Hyper (2500)'}
                   </span>
                 </div>
                 <div className="flex justify-between text-text-muted">
-                  <span>Target Level: <strong className="text-white">Lvl {rec.level}</strong> ({rec.cp} CP)</span>
                   <span>
-                    Rank <strong className={rec.league === 'Super League' ? 'text-accent-blue' : 'text-accent-orange'}>#{rec.rank}</strong>
-                    <span className="text-[0.65rem] text-text-muted"> ({rec.percentile.toFixed(2)}%)</span>
+                    Target Level:{' '}
+                    <strong className="text-white">Lvl {rec.level}</strong> (
+                    {rec.cp} CP)
+                  </span>
+                  <span>
+                    Rank{' '}
+                    <strong
+                      className={
+                        rec.league === 'Super League'
+                          ? 'text-accent-blue'
+                          : 'text-accent-orange'
+                      }
+                    >
+                      #{rec.rank}
+                    </strong>
+                    <span className="text-[0.65rem] text-text-muted">
+                      {' '}
+                      ({rec.percentile.toFixed(2)}%)
+                    </span>
                   </span>
                 </div>
               </div>

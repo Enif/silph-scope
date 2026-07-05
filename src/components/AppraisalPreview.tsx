@@ -6,7 +6,11 @@ interface AppraisalPreviewProps {
   sta: number
 }
 
-export const AppraisalPreview: React.FC<AppraisalPreviewProps> = ({ atk, def, sta }) => {
+export const AppraisalPreview: React.FC<AppraisalPreviewProps> = ({
+  atk,
+  def,
+  sta,
+}) => {
   const totalIvs = atk + def + sta
   const ivPercentage = ((totalIvs / 45) * 100).toFixed(1)
 
@@ -46,7 +50,9 @@ export const AppraisalPreview: React.FC<AppraisalPreviewProps> = ({ atk, def, st
         })}
       </div>
       <div className="flex flex-col items-end gap-0.5">
-        <span className="text-base font-extrabold text-white">{ivPercentage}% IVs</span>
+        <span className="text-base font-extrabold text-white">
+          {ivPercentage}% IVs
+        </span>
         <span className="text-xs text-text-muted font-semibold uppercase font-sans">
           {totalIvs === 45 ? '✨ Perfect Hundo! ✨' : `${atk}/${def}/${sta}`}
         </span>

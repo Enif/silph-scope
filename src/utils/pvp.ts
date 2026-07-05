@@ -37,7 +37,9 @@ export function getKoreanName(englishName: string): string {
   const suffixPart = match[2] ? match[2].trim() : ''
 
   // Look up base name translation
-  const baseKo = (pokemonKoData.base as Record<string, string>)[basePart.toLowerCase()] || basePart
+  const baseKo =
+    (pokemonKoData.base as Record<string, string>)[basePart.toLowerCase()] ||
+    basePart
 
   if (!suffixPart) {
     return baseKo
@@ -46,7 +48,12 @@ export function getKoreanName(englishName: string): string {
   // Look up suffix words translation
   const suffixKo = suffixPart
     .split(/\s+/)
-    .map((word) => (pokemonKoData.suffixes as Record<string, string>)[word.toLowerCase()] || word)
+    .map(
+      (word) =>
+        (pokemonKoData.suffixes as Record<string, string>)[
+          word.toLowerCase()
+        ] || word,
+    )
     .join(' ')
 
   return `${baseKo} (${suffixKo})`
@@ -62,10 +69,13 @@ const translatedPokemonList: Pokemon[] = pokemonData.map((p) => {
 
 export const pokemonList: Pokemon[] = translatedPokemonList
 
-export const pokemonMap: Record<string, Pokemon> = translatedPokemonList.reduce((acc, p) => {
-  acc[p.speciesId] = p
-  return acc
-}, {} as Record<string, Pokemon>)
+export const pokemonMap: Record<string, Pokemon> = translatedPokemonList.reduce(
+  (acc, p) => {
+    acc[p.speciesId] = p
+    return acc
+  },
+  {} as Record<string, Pokemon>,
+)
 
 // Get all evolutions recursively in order (e.g. bulbasaur -> ivysaur -> venusaur)
 export function getEvolutionChain(pokemonId: string): string[] {
@@ -89,7 +99,6 @@ export function getEvolutionChain(pokemonId: string): string[] {
   return result
 }
 
-
 // Retrieve CPM for a given level
 export function getCpm(level: number): number {
   const index = Math.round((level - 1) * 2)
@@ -107,14 +116,16 @@ export function calculateCp(
   ivAtk: number,
   ivDef: number,
   ivSta: number,
-  level: number
+  level: number,
 ): number {
   const cpm = getCpm(level)
   const atk = baseAtk + ivAtk
   const def = baseDef + ivDef
   const sta = baseHp + ivSta
 
-  const cp = Math.floor((atk * Math.sqrt(def) * Math.sqrt(sta) * (cpm * cpm)) / 10)
+  const cp = Math.floor(
+    (atk * Math.sqrt(def) * Math.sqrt(sta) * (cpm * cpm)) / 10,
+  )
   return Math.max(10, cp)
 }
 
@@ -126,7 +137,7 @@ export function calculateStats(
   ivAtk: number,
   ivDef: number,
   ivSta: number,
-  level: number
+  level: number,
 ) {
   const cpm = getCpm(level)
   return {
@@ -144,9 +155,17 @@ export function calculateStatProduct(
   ivAtk: number,
   ivDef: number,
   ivSta: number,
-  level: number
+  level: number,
 ): number {
-  const stats = calculateStats(baseAtk, baseDef, baseHp, ivAtk, ivDef, ivSta, level)
+  const stats = calculateStats(
+    baseAtk,
+    baseDef,
+    baseHp,
+    ivAtk,
+    ivDef,
+    ivSta,
+    level,
+  )
   return stats.atk * stats.def * stats.hp
 }
 
@@ -157,7 +176,7 @@ export function getBestStatsForLeague(
   ivDef: number,
   ivSta: number,
   cpCap: number,
-  maxLevel: number = 50
+  maxLevel: number = 50,
 ): { level: number; cp: number; statProduct: number } | null {
   let bestLevel = 1
   let bestCp = 10
@@ -166,9 +185,25 @@ export function getBestStatsForLeague(
 
   // Loop through levels 1 to maxLevel (increment by 0.5)
   for (let lvl = 1; lvl <= maxLevel; lvl += 0.5) {
-    const cp = calculateCp(pokemon.atk, pokemon.def, pokemon.hp, ivAtk, ivDef, ivSta, lvl)
+    const cp = calculateCp(
+      pokemon.atk,
+      pokemon.def,
+      pokemon.hp,
+      ivAtk,
+      ivDef,
+      ivSta,
+      lvl,
+    )
     if (cp <= cpCap) {
-      const sp = calculateStatProduct(pokemon.atk, pokemon.def, pokemon.hp, ivAtk, ivDef, ivSta, lvl)
+      const sp = calculateStatProduct(
+        pokemon.atk,
+        pokemon.def,
+        pokemon.hp,
+        ivAtk,
+        ivDef,
+        ivSta,
+        lvl,
+      )
       if (sp > bestStatProduct) {
         bestStatProduct = sp
         bestLevel = lvl
@@ -194,7 +229,7 @@ const rankingsCache: Record<string, IvSpread[]> = {}
 export function getLeagueRankings(
   pokemon: Pokemon,
   cpCap: number,
-  maxLevel: number = 50
+  maxLevel: number = 50,
 ): IvSpread[] {
   const cacheKey = `${pokemon.speciesId}_${cpCap}_${maxLevel}`
   if (rankingsCache[cacheKey]) {
@@ -258,11 +293,11 @@ export function getIvSpreadRank(
   ivDef: number,
   ivSta: number,
   cpCap: number,
-  maxLevel: number = 50
+  maxLevel: number = 50,
 ): IvSpread | null {
   const rankings = getLeagueRankings(pokemon, cpCap, maxLevel)
   const match = rankings.find(
-    (r) => r.ivAtk === ivAtk && r.ivDef === ivDef && r.ivSta === ivSta
+    (r) => r.ivAtk === ivAtk && r.ivDef === ivDef && r.ivSta === ivSta,
   )
   return match || null
 }

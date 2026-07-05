@@ -2,9 +2,12 @@ import fs from 'fs'
 import path from 'path'
 
 const CPM_URL = 'https://raw.githubusercontent.com/Mygod/ohbem/master/cpm.json'
-const POKEMON_URL = 'https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/gamemaster.json'
-const TRANSLATION_KO_URL = 'https://raw.githubusercontent.com/sindresorhus/pokemon/main/data/ko.json'
-const TRANSLATION_EN_URL = 'https://raw.githubusercontent.com/sindresorhus/pokemon/main/data/en.json'
+const POKEMON_URL =
+  'https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/gamemaster.json'
+const TRANSLATION_KO_URL =
+  'https://raw.githubusercontent.com/sindresorhus/pokemon/main/data/ko.json'
+const TRANSLATION_EN_URL =
+  'https://raw.githubusercontent.com/sindresorhus/pokemon/main/data/en.json'
 
 const DATA_DIR = path.resolve('src/data')
 
@@ -24,14 +27,16 @@ async function updateCpm() {
     cpmList = data
   } else if (typeof data === 'object') {
     const sortedKeys = Object.keys(data).sort((a, b) => Number(a) - Number(b))
-    cpmList = sortedKeys.map(k => data[k])
+    cpmList = sortedKeys.map((k) => data[k])
   } else {
     throw new Error('Unexpected CPM data format')
   }
 
   const outputPath = path.join(DATA_DIR, 'cpm.json')
   fs.writeFileSync(outputPath, JSON.stringify(cpmList, null, 2))
-  console.log(`✓ CPM multipliers saved to ${outputPath} (${cpmList.length} levels)`)
+  console.log(
+    `✓ CPM multipliers saved to ${outputPath} (${cpmList.length} levels)`,
+  )
 }
 
 async function updatePokemonData() {
@@ -61,18 +66,22 @@ async function updatePokemonData() {
 
   const outputPath = path.join(DATA_DIR, 'pokemon.json')
   fs.writeFileSync(outputPath, JSON.stringify(cleanedPokemon, null, 2))
-  console.log(`✓ Pokémon base stats saved to ${outputPath} (${cleanedPokemon.length} entries)`)
+  console.log(
+    `✓ Pokémon base stats saved to ${outputPath} (${cleanedPokemon.length} entries)`,
+  )
 }
 
 async function updateTranslations() {
   console.log('3/3: Fetching Pokémon name translations...')
   const [koRes, enRes] = await Promise.all([
     fetch(TRANSLATION_KO_URL),
-    fetch(TRANSLATION_EN_URL)
+    fetch(TRANSLATION_EN_URL),
   ])
 
   if (!koRes.ok || !enRes.ok) {
-    throw new Error(`Translation fetch failed: ko=${koRes.status}, en=${enRes.status}`)
+    throw new Error(
+      `Translation fetch failed: ko=${koRes.status}, en=${enRes.status}`,
+    )
   }
 
   const koData = await koRes.json()
@@ -85,47 +94,47 @@ async function updateTranslations() {
   }
 
   const suffixMap = {
-    'shadow': '그림자',
-    'purified': '정화',
-    'alolan': '알로라',
-    'alola': '알로라',
-    'galarian': '가라르',
-    'galar': '가라르',
-    'hisuian': '히스이',
-    'hisui': '히스이',
-    'paldean': '팔데아',
-    'paldea': '팔데아',
-    'origin': '오리진',
-    'altered': '어나더',
-    'defense': '디펜스',
-    'attack': '어택',
-    'speed': '스피드',
-    'therian': '영물',
-    'incarnate': '화신',
-    'pirouette': '스텝',
-    'aria': '보이스',
-    'sunny': '태양',
-    'rainy': '빗방울',
-    'snowy': '설운',
-    'normal': '노멀',
-    'plant': '초목',
-    'sandy': '모래땅',
-    'trash': '쓰레기',
-    'sunshine': '포지티브',
-    'overcast': '네거티브',
-    'female': '암컷',
-    'male': '수컷',
-    'armored': '아머드',
-    'black': '블랙',
-    'white': '화이트',
-    'dusk': '황혼의 갈기',
-    'dawn': '새벽의 날개',
-    'ultra': '울트라',
+    shadow: '그림자',
+    purified: '정화',
+    alolan: '알로라',
+    alola: '알로라',
+    galarian: '가라르',
+    galar: '가라르',
+    hisuian: '히스이',
+    hisui: '히스이',
+    paldean: '팔데아',
+    paldea: '팔데아',
+    origin: '오리진',
+    altered: '어나더',
+    defense: '디펜스',
+    attack: '어택',
+    speed: '스피드',
+    therian: '영물',
+    incarnate: '화신',
+    pirouette: '스텝',
+    aria: '보이스',
+    sunny: '태양',
+    rainy: '빗방울',
+    snowy: '설운',
+    normal: '노멀',
+    plant: '초목',
+    sandy: '모래땅',
+    trash: '쓰레기',
+    sunshine: '포지티브',
+    overcast: '네거티브',
+    female: '암컷',
+    male: '수컷',
+    armored: '아머드',
+    black: '블랙',
+    white: '화이트',
+    dusk: '황혼의 갈기',
+    dawn: '새벽의 날개',
+    ultra: '울트라',
   }
 
   const result = {
     base: translationMap,
-    suffixes: suffixMap
+    suffixes: suffixMap,
   }
 
   const outputPath = path.join(DATA_DIR, 'pokemon_ko.json')
