@@ -47,12 +47,11 @@ export const EvolutionChain: React.FC<EvolutionChainProps> = ({
   return (
     <div className="bg-bg-panel border border-white/6 rounded-[20px] backdrop-blur-[16px] p-6 shadow-[0_12px_40px_rgba(0,0,0,0.35)] hover:border-border-glow hover:shadow-[0_16px_48px_rgba(142,68,173,0.1)] transition-all duration-300 font-sans">
       <h2 className="text-xl font-bold mb-6 bg-gradient-to-r from-white to-text-muted bg-clip-text text-transparent">
-        🌱 Evolution Family Tree Analysis
+        🌱 진화 단계별 분석
       </h2>
       <p className="text-[0.85rem] text-text-muted mb-5 leading-relaxed">
-        Compare PvP percentages for the base Pokémon and all subsequent
-        evolution stages. Click a card to view detailed stats and IV spread
-        tables below.
+        같은 IV로 각 진화 단계의 PvP 순위를 비교합니다. 카드를 누르면 아래에
+        해당 포켓몬의 상세 정보와 IV 순위표가 표시됩니다.
       </p>
       <div className="flex flex-col gap-3">
         {evolutionIds.map((evoId) => {
@@ -85,7 +84,16 @@ export const EvolutionChain: React.FC<EvolutionChainProps> = ({
                   ? 'bg-accent-purple/12 border-accent-purple shadow-[0_0_15px_rgba(142,68,173,0.08)]'
                   : 'bg-white/2 border-border-light'
               }`}
+              role="button"
+              tabIndex={0}
+              aria-pressed={isSelected}
               onClick={() => onSelectEvolution(evoId)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  onSelectEvolution(evoId)
+                }
+              }}
             >
               <div className="flex flex-col gap-1.5 flex-1">
                 <h4 className="text-base font-bold text-white flex items-baseline gap-1.5">
@@ -113,11 +121,11 @@ export const EvolutionChain: React.FC<EvolutionChainProps> = ({
               <div className="flex gap-5 my-3 md:my-0 md:mx-6 justify-between md:justify-start w-full md:w-auto">
                 <div className="flex flex-col gap-0.5 min-w-[140px]">
                   <span className="text-[0.65rem] text-text-muted uppercase font-bold">
-                    Super League
+                    슈퍼리그
                   </span>
                   {evoSuper ? (
                     <span className="text-[0.85rem] font-medium text-[#ddd]">
-                      Rank{' '}
+                      순위{' '}
                       <strong className="text-white font-bold">
                         #{evoSuper.rank}
                       </strong>
@@ -128,17 +136,17 @@ export const EvolutionChain: React.FC<EvolutionChainProps> = ({
                     </span>
                   ) : (
                     <span className="text-[0.85rem] font-medium text-bar-red/60">
-                      Ineligible
+                      참가 불가
                     </span>
                   )}
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-[140px]">
                   <span className="text-[0.65rem] text-text-muted uppercase font-bold">
-                    Hyper League
+                    하이퍼리그
                   </span>
                   {evoHyper ? (
                     <span className="text-[0.85rem] font-medium text-[#ddd]">
-                      Rank{' '}
+                      순위{' '}
                       <strong className="text-white font-bold">
                         #{evoHyper.rank}
                       </strong>
@@ -149,7 +157,7 @@ export const EvolutionChain: React.FC<EvolutionChainProps> = ({
                     </span>
                   ) : (
                     <span className="text-[0.85rem] font-medium text-bar-red/60">
-                      Ineligible
+                      참가 불가
                     </span>
                   )}
                 </div>
@@ -162,7 +170,7 @@ export const EvolutionChain: React.FC<EvolutionChainProps> = ({
                     : 'bg-white/5 text-text-muted hover:bg-white/10 hover:text-white'
                 }`}
               >
-                {isSelected ? '📊 Selected' : '🔍 View Details'}
+                {isSelected ? '📊 선택됨' : '🔍 상세 보기'}
               </div>
             </div>
           )

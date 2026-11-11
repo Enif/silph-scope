@@ -79,10 +79,10 @@ export const IvSliders: React.FC<IvSlidersProps> = ({
   return (
     <div className="flex flex-col gap-[18px]">
       <h3 className="text-xs text-text-muted font-bold uppercase tracking-[1.5px] font-sans">
-        Set Individual Values (IVs)
+        개체값 (IV) 설정
       </h3>
-      {renderSegmentedBar('Attack', atk, onChangeAtk)}
-      {renderSegmentedBar('Defense', def, onChangeDef)}
+      {renderSegmentedBar('공격', atk, onChangeAtk)}
+      {renderSegmentedBar('방어', def, onChangeDef)}
       {renderSegmentedBar('HP', sta, onChangeSta)}
     </div>
   )

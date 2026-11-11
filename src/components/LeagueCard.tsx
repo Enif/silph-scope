@@ -58,8 +58,11 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({
                 : 'border-accent-orange/30 shadow-[inset_0_0_15px_rgba(255,140,0,0.05)]'
             }`}
           >
-            <div className="text-[0.65rem] text-text-muted uppercase font-bold tracking-wider mb-0.5">
-              PvP Stat Product
+            <div
+              className="text-[0.65rem] text-text-muted uppercase font-bold tracking-wider mb-0.5"
+              title="1위 IV 조합의 스탯 곱(공격×방어×HP) 대비 현재 IV의 스탯 곱 비율"
+            >
+              스탯 곱 비율 ⓘ
             </div>
             <div className="text-2xl font-extrabold text-white">
               {stats.percentage.toFixed(2)}%
@@ -69,22 +72,25 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({
                 isSuper ? 'bg-accent-blue' : 'bg-accent-orange'
               }`}
             >
-              Rank #{stats.rank}
+              #{stats.rank} / 4096
             </div>
           </div>
 
           <div className="w-full flex flex-col gap-3">
             <div className="flex justify-between items-center text-sm">
-              <span className="text-text-muted font-medium">Optimal CP</span>
+              <span className="text-text-muted font-medium">최적 CP</span>
               <span className="font-bold text-white">{stats.cp} CP</span>
             </div>
             <div className="flex justify-between items-center text-sm">
-              <span className="text-text-muted font-medium">Optimal Level</span>
-              <span className="font-bold text-white">Lvl {stats.level}</span>
+              <span className="text-text-muted font-medium">최적 레벨</span>
+              <span className="font-bold text-white">Lv {stats.level}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
-              <span className="text-text-muted font-medium">
-                Rank Percentile
+              <span
+                className="text-text-muted font-medium"
+                title="4096가지 IV 조합 중 이 IV보다 순위가 낮은 조합의 비율"
+              >
+                순위 백분위 ⓘ
               </span>
               <span className="font-bold text-white">
                 {(((4096 - stats.rank) / 4095) * 100).toFixed(2)}%
@@ -92,16 +98,18 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({
             </div>
             {stats.level > 40 && (
               <div className="bg-red-500/15 border border-red-500/30 text-[#ff5555] text-[0.7rem] font-extrabold py-1 px-2.5 rounded-md text-center uppercase tracking-widest">
-                Requires XL Candy
+                XL 사탕 필요
               </div>
             )}
             <div className="flex justify-between items-center text-sm mt-2 border-b border-white/6 pb-1">
-              <span className="text-text-muted font-medium">Scaled Stats</span>
+              <span className="text-text-muted font-medium">
+                최적 레벨 실능치
+              </span>
             </div>
             <div className="grid grid-cols-3 gap-2.5 mt-1 w-full">
               <div className="bg-white/2 border border-white/6 rounded-lg p-2 flex flex-col items-center gap-0.5">
                 <span className="text-[0.65rem] text-text-muted uppercase font-bold">
-                  Atk
+                  공격
                 </span>
                 <span className="text-sm font-bold text-white">
                   {((pokemon.atk + ivAtk) * getCpm(stats.level)).toFixed(1)}
@@ -109,7 +117,7 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({
               </div>
               <div className="bg-white/2 border border-white/6 rounded-lg p-2 flex flex-col items-center gap-0.5">
                 <span className="text-[0.65rem] text-text-muted uppercase font-bold">
-                  Def
+                  방어
                 </span>
                 <span className="text-sm font-bold text-white">
                   {((pokemon.def + ivDef) * getCpm(stats.level)).toFixed(1)}
@@ -130,7 +138,7 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({
         <div className="bg-white/2 border border-dashed border-white/10 rounded-xl flex flex-col items-center justify-center gap-2 p-10 text-text-muted text-sm font-semibold text-center h-full">
           <span className="text-3xl">⚠️</span>
           <span>
-            Ineligible: Minimum CP exceeds {isSuper ? '1500' : '2500'}
+            참가 불가: 최저 CP가 {isSuper ? '1500' : '2500'}을 넘습니다
           </span>
         </div>
       )}

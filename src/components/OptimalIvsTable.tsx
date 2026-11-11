@@ -53,33 +53,33 @@ export const OptimalIvsTable: React.FC<OptimalIvsTableProps> = ({
   return (
     <div className="bg-bg-panel border border-white/6 rounded-[20px] backdrop-blur-[16px] p-6 shadow-[0_12px_40px_rgba(0,0,0,0.35)] hover:border-border-glow hover:shadow-[0_16px_48px_rgba(142,68,173,0.1)] transition-all duration-300 font-sans">
       <h2 className="text-xl font-bold mb-6 bg-gradient-to-r from-white to-text-muted bg-clip-text text-transparent">
-        🏆 Top 10 Optimal IV Spreads (Rankings)
+        🏆 최적 IV 조합 Top 10
       </h2>
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <div className="flex flex-col">
           <h3 className="text-xs text-text-muted font-bold uppercase tracking-[1.5px] mb-4">
-            Super League (1500 Cap)
+            슈퍼리그 (1500 CP 제한)
           </h3>
           <div className="overflow-x-auto w-full">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-white/8">
-                  <th className="text-left py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
-                    Rank
+                  <th className="text-left whitespace-nowrap py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
+                    순위
                   </th>
-                  <th className="text-left py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
-                    IV spread
+                  <th className="text-left whitespace-nowrap py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
+                    IV
                   </th>
-                  <th className="text-left py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
-                    Lvl
+                  <th className="text-left whitespace-nowrap py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
+                    레벨
                   </th>
-                  <th className="text-left py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
+                  <th className="text-left whitespace-nowrap py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
                     CP
                   </th>
-                  <th className="text-left py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
-                    Stat Prod
+                  <th className="text-left whitespace-nowrap py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
+                    스탯 곱
                   </th>
-                  <th className="text-left py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
+                  <th className="text-left whitespace-nowrap py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
                     %
                   </th>
                 </tr>
@@ -91,28 +91,28 @@ export const OptimalIvsTable: React.FC<OptimalIvsTableProps> = ({
 
         <div className="flex flex-col">
           <h3 className="text-xs text-text-muted font-bold uppercase tracking-[1.5px] mb-4">
-            Hyper League (2500 Cap)
+            하이퍼리그 (2500 CP 제한)
           </h3>
           <div className="overflow-x-auto w-full">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-white/8">
-                  <th className="text-left py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
-                    Rank
+                  <th className="text-left whitespace-nowrap py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
+                    순위
                   </th>
-                  <th className="text-left py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
-                    IV spread
+                  <th className="text-left whitespace-nowrap py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
+                    IV
                   </th>
-                  <th className="text-left py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
-                    Lvl
+                  <th className="text-left whitespace-nowrap py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
+                    레벨
                   </th>
-                  <th className="text-left py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
+                  <th className="text-left whitespace-nowrap py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
                     CP
                   </th>
-                  <th className="text-left py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
-                    Stat Prod
+                  <th className="text-left whitespace-nowrap py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
+                    스탯 곱
                   </th>
-                  <th className="text-left py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
+                  <th className="text-left whitespace-nowrap py-2.5 px-3 text-[0.7rem] text-text-muted font-bold uppercase tracking-wider">
                     %
                   </th>
                 </tr>

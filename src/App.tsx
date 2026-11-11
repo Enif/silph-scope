@@ -12,10 +12,62 @@ import { PokemonSearch } from './components/PokemonSearch'
 import { IvSliders } from './components/IvSliders'
 import { AppraisalPreview } from './components/AppraisalPreview'
 import { ScreenshotScanner } from './components/ScreenshotScanner'
+import type { ScanResult, ScanFeedback } from './components/ScreenshotScanner'
 import { EvolutionChain } from './components/EvolutionChain'
 import { LeagueCard } from './components/LeagueCard'
 import { OptimalIvsTable } from './components/OptimalIvsTable'
 import { LevelValidator } from './components/LevelValidator'
+import type { Pokemon } from './utils/pvp'
+
+const normalizeEng = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '')
+const normalizeKo = (s: string) => s.replace(/[^가-힣]/g, '')
+
+/**
+ * Match OCR'd name text to a Pokémon.
+ * Exact matches win; for partial matches the longest (most specific) name wins,
+ * and regular forms are preferred over Shadow forms, since the appraisal
+ * screen name does not include the form.
+ */
+function matchPokemonByName(rawName: string): Pokemon | null {
+  const cleaned = rawName
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9가-힣]/g, '')
+  if (!cleaned) return null
+
+  const isShadow = (p: Pokemon) => p.speciesId.endsWith('_shadow')
+  const byPreference = (a: Pokemon, b: Pokemon) =>
+    Number(isShadow(a)) - Number(isShadow(b))
+
+  const exact = pokemonList
+    .filter(
+      (p) =>
+        normalizeEng(p.speciesName) === cleaned ||
+        normalizeKo(p.speciesNameKo) === cleaned,
+    )
+    .sort(byPreference)
+  if (exact.length > 0) return exact[0]
+
+  let best: Pokemon | null = null
+  let bestScore = 0
+  for (const p of pokemonList) {
+    const eng = normalizeEng(p.speciesName)
+    const ko = normalizeKo(p.speciesNameKo)
+    let score = 0
+    if (ko.length >= 2 && cleaned.includes(ko)) score = ko.length * 2
+    else if (cleaned.length >= 2 && ko.includes(cleaned))
+      score = cleaned.length * 2
+    else if (eng.length >= 3 && cleaned.includes(eng)) score = eng.length
+    else if (cleaned.length >= 3 && eng.includes(cleaned))
+      score = cleaned.length
+    if (isShadow(p)) score -= 0.5
+    if (score > bestScore) {
+      bestScore = score
+      best = p
+    }
+  }
+  return best
+}
 
 function App() {
   // Input states
@@ -82,50 +134,24 @@ function App() {
   }, [selectedEvolutionPokemon, maxLevel])
 
   // Handler for image scanning results
-  const handleScanSuccess = (
-    atk: number,
-    def: number,
-    hp: number,
-    pokemonName?: string,
-    cp?: number,
-    hpMax?: number,
-  ) => {
+  const handleScanSuccess = ({
+    atk,
+    def,
+    hp,
+    pokemonName,
+    cp,
+    hpMax,
+  }: ScanResult): ScanFeedback => {
     setIvAtk(atk)
     setIvDef(def)
     setIvSta(hp)
 
     let finalHp = hpMax
-    let matchedPokemon = null
+    const matchedPokemon = pokemonName ? matchPokemonByName(pokemonName) : null
 
-    if (pokemonName) {
-      const cleanedName = pokemonName
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9가-힣]/g, '')
-      let matched = pokemonList.find((p) => {
-        const pNameEng = p.speciesName.toLowerCase().replace(/[^a-z0-9]/g, '')
-        const pNameKo = p.speciesNameKo.replace(/[^가-힣]/g, '')
-        return pNameEng === cleanedName || pNameKo === cleanedName
-      })
-
-      if (!matched) {
-        matched = pokemonList.find((p) => {
-          const pNameEng = p.speciesName.toLowerCase().replace(/[^a-z0-9]/g, '')
-          const pNameKo = p.speciesNameKo.replace(/[^가-힣]/g, '')
-          return (
-            (cleanedName.length >= 2 && pNameKo.includes(cleanedName)) ||
-            (pNameKo.length >= 2 && cleanedName.includes(pNameKo)) ||
-            (cleanedName.length >= 3 && pNameEng.includes(cleanedName)) ||
-            (pNameEng.length >= 3 && cleanedName.includes(pNameEng))
-          )
-        })
-      }
-
-      if (matched) {
-        setSelectedSpeciesId(matched.speciesId)
-        setSelectedEvolutionId(matched.speciesId)
-        matchedPokemon = matched
-      }
+    if (matchedPokemon) {
+      setSelectedSpeciesId(matchedPokemon.speciesId)
+      setSelectedEvolutionId(matchedPokemon.speciesId)
     }
 
     if (cp !== undefined) {
@@ -133,41 +159,38 @@ function App() {
 
       // Smart correction: calculate expected HP from the parsed CP, species, and scanned IVs
       const targetPokemon = matchedPokemon || selectedPokemon
-      if (targetPokemon) {
-        let expectedHpForCp: number | undefined = undefined
-        for (let lvl = 1; lvl <= 51; lvl += 0.5) {
-          const expectedCp = calculateCp(
-            targetPokemon.atk,
-            targetPokemon.def,
-            targetPokemon.hp,
-            atk,
-            def,
-            hp,
-            lvl,
+      let expectedHpForCp: number | undefined = undefined
+      for (let lvl = 1; lvl <= 51; lvl += 0.5) {
+        const expectedCp = calculateCp(
+          targetPokemon.atk,
+          targetPokemon.def,
+          targetPokemon.hp,
+          atk,
+          def,
+          hp,
+          lvl,
+        )
+        if (expectedCp === cp) {
+          expectedHpForCp = Math.max(
+            10,
+            Math.floor((targetPokemon.hp + hp) * getCpm(lvl)),
           )
-          if (expectedCp === cp) {
-            expectedHpForCp = Math.max(
-              10,
-              Math.floor((targetPokemon.hp + hp) * getCpm(lvl)),
-            )
-            break
-          }
+          break
         }
+      }
 
-        if (expectedHpForCp !== undefined) {
-          if (finalHp === undefined || finalHp !== expectedHpForCp) {
-            const hpStr = finalHp ? finalHp.toString() : ''
-            const expectedStr = expectedHpForCp.toString()
-            // If the scanned HP string contains or is contained in the expected HP string (like "10310" containing "103"), or is missing/obviously wrong, correct it!
-            if (
-              !finalHp ||
-              hpStr.includes(expectedStr) ||
-              expectedStr.includes(hpStr) ||
-              finalHp > 500
-            ) {
-              finalHp = expectedHpForCp
-            }
-          }
+      if (expectedHpForCp !== undefined && finalHp !== expectedHpForCp) {
+        const hpStr = finalHp ? finalHp.toString() : ''
+        const expectedStr = expectedHpForCp.toString()
+        // If the scanned HP string contains or is contained in the expected HP string
+        // (like "10310" containing "103"), or is missing/obviously wrong, correct it
+        if (
+          !finalHp ||
+          hpStr.includes(expectedStr) ||
+          expectedStr.includes(hpStr) ||
+          finalHp > 500
+        ) {
+          finalHp = expectedHpForCp
         }
       }
     }
@@ -175,6 +198,8 @@ function App() {
     if (finalHp !== undefined) {
       setInputHp(finalHp.toString())
     }
+
+    return { matchedNameKo: matchedPokemon?.speciesNameKo, finalHp }
   }
 
   return (
@@ -190,7 +215,7 @@ function App() {
           </h1>
         </div>
         <p className="text-xs text-accent-blue font-bold uppercase tracking-[3px] m-0 drop-shadow-[0_0_8px_rgba(0,210,255,0.2)]">
-          Pokémon GO PvP & IV Analytics Dashboard
+          포켓몬 GO PvP · 개체값 분석
         </p>
       </header>
 
@@ -199,8 +224,12 @@ function App() {
         {/* Left column: Input & Controls */}
         <section className="bg-bg-panel border border-white/6 rounded-[20px] backdrop-blur-[16px] p-6 shadow-[0_12px_40px_rgba(0,0,0,0.35)] hover:border-border-glow hover:shadow-[0_16px_48px_rgba(142,68,173,0.1)] transition-all duration-300 flex flex-col gap-6">
           <h2 className="text-xl font-bold mb-1 bg-gradient-to-r from-white to-text-muted bg-clip-text text-transparent">
-            🔬 Pokémon Appraisal
+            🔬 포켓몬 감정
           </h2>
+
+          <ScreenshotScanner onScanSuccess={handleScanSuccess} />
+
+          <div className="h-[1px] bg-white/6 w-full" />
 
           <PokemonSearch
             selectedPokemon={selectedPokemon}
@@ -210,11 +239,11 @@ function App() {
             }}
           />
 
-          <div className="flex items-center justify-between mt-2">
+          <label className="flex items-center justify-between mt-2 cursor-pointer">
             <span className="text-xs text-text-muted font-bold uppercase tracking-wider">
-              Include Level 51 (Best Buddy Boost)
+              레벨 51 포함 (최고의 파트너 부스트)
             </span>
-            <label className="relative inline-block w-[46px] h-[24px]">
+            <span className="relative inline-block w-[46px] h-[24px]">
               <input
                 type="checkbox"
                 checked={includeLevel51}
@@ -222,8 +251,8 @@ function App() {
                 className="opacity-0 w-0 h-0 peer"
               />
               <span className="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-white/10 rounded-full transition-all duration-300 before:absolute before:content-[''] before:h-[18px] before:w-[18px] before:left-[3px] before:bottom-[3px] before:bg-white before:rounded-full before:transition-all before:duration-300 peer-checked:bg-accent-purple peer-checked:before:translate-x-[22px]"></span>
-            </label>
-          </div>
+            </span>
+          </label>
 
           <div className="h-[1px] bg-white/6 w-full" />
 
@@ -237,10 +266,6 @@ function App() {
           />
 
           <AppraisalPreview atk={ivAtk} def={ivDef} sta={ivSta} />
-
-          <div className="h-[1px] bg-white/6 w-full" />
-
-          <ScreenshotScanner onScanSuccess={handleScanSuccess} />
 
           <div className="h-[1px] bg-white/6 w-full" />
 
@@ -273,8 +298,8 @@ function App() {
           {/* League summaries side-by-side */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <LeagueCard
-              title={`${selectedEvolutionPokemon.speciesNameKo} Super`}
-              subtitle="Great League (Max 1500 CP)"
+              title={`${selectedEvolutionPokemon.speciesNameKo} · 슈퍼리그`}
+              subtitle="Great League · 최대 1500 CP"
               leagueType="super"
               stats={superLeagueStats}
               pokemon={selectedEvolutionPokemon}
@@ -284,8 +309,8 @@ function App() {
             />
 
             <LeagueCard
-              title={`${selectedEvolutionPokemon.speciesNameKo} Hyper`}
-              subtitle="Ultra League (Max 2500 CP)"
+              title={`${selectedEvolutionPokemon.speciesNameKo} · 하이퍼리그`}
+              subtitle="Ultra League · 최대 2500 CP"
               leagueType="hyper"
               stats={hyperLeagueStats}
               pokemon={selectedEvolutionPokemon}

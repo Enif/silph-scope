@@ -51,10 +51,10 @@ export const AppraisalPreview: React.FC<AppraisalPreviewProps> = ({
       </div>
       <div className="flex flex-col items-end gap-0.5">
         <span className="text-base font-extrabold text-white">
-          {ivPercentage}% IVs
+          IV {ivPercentage}%
         </span>
         <span className="text-xs text-text-muted font-semibold uppercase font-sans">
-          {totalIvs === 45 ? '✨ Perfect Hundo! ✨' : `${atk}/${def}/${sta}`}
+          {totalIvs === 45 ? '✨ 100% 개체! ✨' : `${atk}/${def}/${sta}`}
         </span>
       </div>
     </div>
