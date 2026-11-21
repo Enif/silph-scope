@@ -73,13 +73,13 @@ export const PokemonSearch: React.FC<PokemonSearchProps> = ({
         htmlFor="pokemon-search"
         className="text-xs uppercase tracking-wider text-text-muted font-bold"
       >
-        Select Pokémon
+        포켓몬 선택
       </label>
       <div className="relative w-full">
         <input
           id="pokemon-search"
           type="text"
-          placeholder="Search Pokémon species (e.g. Swampert, 대짱이)..."
+          placeholder="포켓몬 이름 검색 (예: 대짱이, Swampert)"
           value={inputValue}
           onFocus={() => {
             setDropdownOpen(true)
@@ -134,7 +134,7 @@ export const PokemonSearch: React.FC<PokemonSearchProps> = ({
           })}
           {filteredPokemon.length === 0 && (
             <div className="p-4 text-center text-text-muted text-sm">
-              No Pokémon found
+              검색 결과가 없습니다
             </div>
           )}
         </div>

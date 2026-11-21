@@ -68,7 +68,7 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
     }
 
     const results = []
-    for (let lvl = 1; lvl <= 50; lvl += 0.5) {
+    for (let lvl = 1; lvl <= maxLevel; lvl += 0.5) {
       const expectedCp = calculateCp(
         selectedPokemon.atk,
         selectedPokemon.def,
@@ -88,7 +88,7 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
       }
     }
     return results
-  }, [selectedPokemon, ivAtk, ivDef, ivSta, inputCp, inputHp])
+  }, [selectedPokemon, ivAtk, ivDef, ivSta, inputCp, inputHp, maxLevel])
 
   // Generate top 2 best reachable recommendations
   const recommendations = useMemo(() => {
@@ -107,8 +107,8 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
     }> = []
 
     const leagues = [
-      { name: 'Super League', cap: 1500 },
-      { name: 'Hyper League', cap: 2500 },
+      { name: 'super', cap: 1500 },
+      { name: 'hyper', cap: 2500 },
     ]
 
     for (const evoId of evolutionIds) {
@@ -185,11 +185,11 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
   return (
     <div className="flex flex-col gap-4 font-sans text-text-main">
       <h3 className="text-xs text-text-muted font-bold uppercase tracking-[1.5px]">
-        📏 Level & CP Validator
+        📏 레벨 · CP 검증
       </h3>
       <p className="text-[0.8rem] text-text-muted leading-relaxed">
-        Verify if this Pokémon can reach the given CP/HP at the current IVs and
-        estimate its exact level.
+        게임 화면의 CP와 HP를 입력하면 현재 IV 기준으로 정확한 레벨을 찾고, 추천
+        진화 경로를 알려드립니다.
       </p>
 
       <div className="grid grid-cols-2 gap-4">
@@ -199,7 +199,8 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
           </label>
           <input
             type="number"
-            placeholder="e.g. 1500"
+            placeholder="예: 1500"
+            inputMode="numeric"
             value={inputCp}
             onChange={(e) => onCpChange(e.target.value)}
             className="w-full bg-black/35 border border-white/6 rounded-lg text-text-main py-2 px-3 text-sm outline-none focus:border-accent-blue transition-all"
@@ -211,7 +212,8 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
           </label>
           <input
             type="number"
-            placeholder="e.g. 120"
+            placeholder="예: 120"
+            inputMode="numeric"
             value={inputHp}
             onChange={(e) => onHpChange(e.target.value)}
             className="w-full bg-black/35 border border-white/6 rounded-lg text-text-main py-2 px-3 text-sm outline-none focus:border-accent-blue transition-all"
@@ -229,8 +231,8 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
           }`}
         >
           {matches.length > 0
-            ? `✓ Valid! Your Pokémon is exactly Level ${matches.join(' / ')}.`
-            : `❌ Impossible combination! These stats do not match the current IVs.`}
+            ? `✓ 확인됨! 이 포켓몬은 레벨 ${matches.join(' / ')} 입니다.`
+            : '❌ 현재 IV로는 나올 수 없는 CP/HP 조합입니다. IV 값, 선택한 포켓몬(그림자·지역 폼 포함), CP/HP 입력값을 다시 확인해 주세요.'}
         </div>
       )}
 
@@ -238,14 +240,14 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
       {recommendations && recommendations.length > 0 && (
         <div className="bg-gradient-to-br from-accent-purple/10 to-bg-panel/40 border border-accent-purple/20 rounded-xl p-3.5 flex flex-col gap-3">
           <span className="text-[0.7rem] text-accent-blue uppercase font-bold tracking-wider">
-            💡 Recommended PvP Evolution Paths:
+            💡 추천 PvP 진화 경로
           </span>
           <div className="flex flex-col gap-2.5">
             {recommendations.map((rec, i) => (
               <div
                 key={`${rec.speciesName}-${rec.league}`}
                 className={`p-3 bg-white/2 border border-white/6 border-l-4 rounded-lg text-xs flex flex-col gap-1.5 hover:border-accent-blue/30 transition-all ${
-                  rec.league === 'Super League'
+                  rec.league === 'super'
                     ? 'border-l-accent-blue/70'
                     : 'border-l-accent-orange/70'
                 }`}
@@ -259,27 +261,27 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
                   </span>
                   <span
                     className={`font-bold px-2 py-0.5 rounded text-[0.65rem] uppercase ${
-                      rec.league === 'Super League'
+                      rec.league === 'super'
                         ? 'bg-accent-blue/15 border border-accent-blue/30 text-accent-blue'
                         : 'bg-accent-orange/15 border border-accent-orange/30 text-accent-orange'
                     }`}
                   >
-                    {rec.league === 'Super League'
-                      ? 'Super (1500)'
-                      : 'Hyper (2500)'}
+                    {rec.league === 'super'
+                      ? '슈퍼리그 (1500)'
+                      : '하이퍼리그 (2500)'}
                   </span>
                 </div>
                 <div className="flex justify-between text-text-muted">
                   <span>
-                    Target Level:{' '}
-                    <strong className="text-white">Lvl {rec.level}</strong> (
+                    목표 레벨:{' '}
+                    <strong className="text-white">Lv {rec.level}</strong> (
                     {rec.cp} CP)
                   </span>
                   <span>
-                    Rank{' '}
+                    순위{' '}
                     <strong
                       className={
-                        rec.league === 'Super League'
+                        rec.league === 'super'
                           ? 'text-accent-blue'
                           : 'text-accent-orange'
                       }
@@ -301,7 +303,7 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
       {/* Expected Stats list */}
       <div className="bg-white/2 border border-white/6 rounded-xl p-3 flex flex-col gap-2">
         <span className="text-[0.7rem] text-text-muted uppercase font-bold tracking-wider font-sans">
-          Expected Stats at Key Levels (for current IVs):
+          주요 레벨별 예상 CP / HP (현재 IV 기준)
         </span>
         <div className="grid grid-cols-2 gap-2">
           {keyLevelStats.map((cand) => {
@@ -315,7 +317,7 @@ export const LevelValidator: React.FC<LevelValidatorProps> = ({
                     : 'bg-black/10 border-white/4 text-text-muted'
                 }`}
               >
-                <span>Lvl {cand.level}</span>
+                <span>Lv {cand.level}</span>
                 <span className={isMatch ? 'text-white' : 'text-[#eee]'}>
                   {cand.cp} CP / {cand.hp} HP
                 </span>
